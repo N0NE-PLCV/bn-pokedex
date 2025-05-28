@@ -1,12 +1,39 @@
 <div class="modal-overlay" *ngIf="isOpen" (click)="closeModal()">
-    <div class="modal-content" (click)="$event.stopPropagation()">
-      <div class="search-wrapper">
-        <input type="text" placeholder="Find Pokémon"/>
-        <img src="../assets/search.png" alt="search" class="search-icon" />
+  <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="search-wrapper"> 
+        <input 
+          type="text" 
+          [(ngModel)]="searchText" 
+          placeholder="Find Pokémon" 
+          (keyup.enter)="searchPokemon()" />
+          <img class="search-icon" src="assets/search.png" alt="Search Icon" (click)="searchPokemon()" />
       </div>
-      <div class="modal-body">
-        
+      
+    
+    <div class="modal-body">
+    
+      
+      <div class="pokemon-results">
+        <div *ngFor="let pokemon of pokemonList" class="pokemon-card">
+          <img 
+            [src]="pokemon.imageUrl" 
+            [alt]="pokemon.name" 
+            onError="this.src='https://placehold.co/96x96/EEE/333?text=No+Image'" />
+          <p>{{ pokemon.name }}</p>
+          <!-- 
+            Display other Pokémon info (HP, Strength, Weakness, Happiness) here.
+            You'll need to calculate these values based on the README.md 
+            and ensure they are available on the 'pokemon' object.
+            Example:
+            <p>HP: {{ pokemon.calculatedHp }}</p>
+            <p>Type(s): {{ pokemon.types?.join(', ') }}</p> 
+          -->
+          <button (click)="addPokemonToPokedex(pokemon)">Add</button> 
+        </div>
+        <div *ngIf="pokemonList.length === 0 && searchText && searchText.trim().length > 0" class="no-results-message">
+          No Pokémon found matching "{{ searchText }}".
+        </div>
       </div>
     </div>
   </div>
-
+</div>
