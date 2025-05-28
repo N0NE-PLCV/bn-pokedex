@@ -1,0 +1,12 @@
+<div class="modal-overlay" *ngIf="isOpen" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="search-wrapper">
+        <input type="text" placeholder="Find Pokémon"/>
+        <img src="../assets/search.png" alt="search" class="search-icon" />
+      </div>
+      <div class="modal-body">
+        
+      </div>
+    </div>
+  </div>
+

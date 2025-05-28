@@ -1,1 +1,17 @@
-<div id="root"></div>
+<div id="root">
+    <header id="header">My Pokédex</header>
+    <section id="card">
+        Card
+    </section>
+
+    <footer id="footer">
+        <div class="footer-plus" (click)="openModal()">
+            <span class="plus-icon">+</span>
+        </div>
+    </footer>
+
+    <app-modal
+      [isOpen]="isModalOpen"
+      (close)="closeModal()">
+    </app-modal>
+</div>
