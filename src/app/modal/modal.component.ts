@@ -1,43 +1,51 @@
 // src/app/modal/modal.component.ts
-import { Component, EventEmitter, Input, Output } from '@angular/core'; // Removed OnInit, OnDestroy
+import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core'; // Added OnChanges, SimpleChanges
 import { PokemonService } from '../service/pokemon.service';
-import { forkJoin, of } from 'rxjs'; // Removed Subject, Subscription
-import { map, catchError } from 'rxjs/operators'; // Removed debounceTime, distinctUntilChanged, switchMap
+import { forkJoin, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'app-modal',
   templateUrl: './modal.component.html',
-  styleUrls: ['./modal.component.scss'] // Ensure this path is correct
+  styleUrls: ['./modal.component.scss']
 })
-export class ModalComponent { // Removed implements OnInit, OnDestroy
+export class ModalComponent implements OnChanges { // Added OnChanges
   @Input() isOpen: boolean = false;
+  @Input() pokedexList: any[] = []; // New Input: list of Pokémon in the Pokedex
   @Output() close = new EventEmitter<void>();
   @Output() pokemonAdded = new EventEmitter<any>();
 
   searchText: string = '';
-  pokemonList: any[] = [];
-
-  // Removed searchSubject and searchSubscription
+  private pokemonListFromApi: any[] = []; // Stores raw API results
+  displayablePokemonList: any[] = []; // Pokémon to display in modal (filtered)
 
   constructor(private pokemonService: PokemonService) {}
 
-  // Removed ngOnInit and ngOnDestroy
+  ngOnChanges(changes: SimpleChanges): void {
+    // If the pokedexList input changes (e.g., a Pokémon is added or removed from the Pokedex),
+    // update the displayable list in the modal.
+    if (changes['pokedexList']) {
+      this.updateDisplayablePokemonList();
+    }
+  }
 
   closeModal() {
     this.close.emit();
-    this.pokemonList = []; // Clear list when modal closes
-    this.searchText = ''; // Reset search text
+    this.pokemonListFromApi = []; // Clear API list
+    this.displayablePokemonList = []; // Clear display list
+    this.searchText = '';
   }
 
-  // Reverted to explicit searchPokemon method
   searchPokemon() {
     const term = this.searchText.trim().toLowerCase();
 
     if (!term) {
-      this.pokemonList = [];
+      this.pokemonListFromApi = [];
+      this.updateDisplayablePokemonList();
       return;
     }
 
+    // Preserve existing search logic by name and type
     const searchByName$ = this.pokemonService.getPokemonList(20, term, '').pipe(
       catchError(err => {
         console.error('Error fetching Pokémon by name:', err);
@@ -55,11 +63,10 @@ export class ModalComponent { // Removed implements OnInit, OnDestroy
     forkJoin([searchByName$, searchByType$]).subscribe({
       next: ([nameResults, typeResults]) => {
         const combinedResults = [...(nameResults || []), ...(typeResults || [])];
-
         const uniqueResultsMap = new Map<string, any>();
+
         combinedResults.forEach(pokemon => {
           if (pokemon && pokemon.id && !uniqueResultsMap.has(pokemon.id)) {
-            // Calculate stats (assuming these methods are still present from previous steps)
             const calculatedHp = this.calculateHp(pokemon.hp);
             const calculatedStrength = this.calculateStrength(pokemon.attacks);
             const calculatedWeakness = this.calculateWeakness(pokemon.weaknesses);
@@ -76,24 +83,31 @@ export class ModalComponent { // Removed implements OnInit, OnDestroy
             });
           }
         });
-        this.pokemonList = Array.from(uniqueResultsMap.values());
+        this.pokemonListFromApi = Array.from(uniqueResultsMap.values());
+        this.updateDisplayablePokemonList(); // Update displayable list after fetching
       },
       error: (err) => {
         console.error('Error in combined Pokémon search:', err);
-        this.pokemonList = [];
+        this.pokemonListFromApi = [];
+        this.updateDisplayablePokemonList();
       }
     });
   }
 
-  addPokemonToPokedex(pokemon: any) {
-    console.log('Add to Pokedex (implement this):', pokemon);
-    this.pokemonAdded.emit(pokemon);
+  private updateDisplayablePokemonList() {
+    // Filter out Pokémon that are already in the Pokedex
+    const pokedexIds = new Set(this.pokedexList.map(p => p.id));
+    this.displayablePokemonList = this.pokemonListFromApi.filter(p => !pokedexIds.has(p.id));
   }
 
-  // Ensure these stat calculation and helper methods are present from previous steps:
-  // calculateHp, calculateStrength, calculateWeakness, parseDamage,
-  // calculateTotalDamage, calculateHappiness, getHappinessArray, getStatPercentage
+  addPokemonToPokedex(pokemon: any) {
+    this.pokemonAdded.emit(pokemon);
+    // After emitting, Angular's change detection will update pokedexList in app.component,
+    // which then triggers ngOnChanges here, and updateDisplayablePokemonList will be called,
+    // effectively removing the Pokémon from the modal's view.
+  }
 
+  // Stat calculation and helper methods (getHappinessArray is not strictly needed if using the [0,1,2,3,4] loop)
   getHappinessArray(count: number): any[] {
     const safeCount = Math.max(0, Math.floor(count));
     const displayCount = Math.min(safeCount, 5);
@@ -106,7 +120,6 @@ export class ModalComponent { // Removed implements OnInit, OnDestroy
     return match ? parseInt(match[0], 10) : 0;
   }
 
-  // Dummy stat calculation functions if you removed them (replace with your actual ones)
   private calculateHp(hp?: string): number { return hp ? Math.min(100, parseInt(hp,10) || 0) : 0; }
   private calculateStrength(attacks?: any[]): string { return attacks ? `${Math.min(100, attacks.length * 50)}%` : '0%'; }
   private calculateWeakness(weaknesses?: any[]): string { return weaknesses ? `${Math.min(100, weaknesses.length * 100)}%` : '0%'; }

@@ -28,7 +28,7 @@ $color-text-light: #555555; // For Pokemon type, no results message
   display: flex;
   justify-content: center;
   align-items: center;
-  
+  z-index: 1000; 
 }
 
 .modal-content {

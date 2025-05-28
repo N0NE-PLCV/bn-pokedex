@@ -1,7 +1,57 @@
 <div id="root">
     <header id="header">My Pokédex</header>
-    <section id="card">
-        Card
+    
+    <section id="card-section">
+        <div *ngIf="pokedexPokemon.length === 0" class="empty-pokedex-message">
+            
+        </div>
+        <div class="pokedex-grid">
+            <div *ngFor="let pokemon of pokedexPokemon" class="pokemon-card-display">
+                <button class="delete-button" (click)="handleRemovePokemon(pokemon)" title="Remove from Pokédex">×</button>
+                <div class="pokemon-image-container">
+                    <img [src]="pokemon.imageUrl" [alt]="pokemon.name" onError="this.src='https://placehold.co/100x100/EEE/333?text=No+Img'" />
+                </div>
+                <div class="pokemon-info">
+                    <h3 class="pokemon-name">{{ pokemon.name }}</h3>
+                    <p class="pokemon-type">
+                        {{ pokemon.types?.join(', ') || 'N/A' }}
+                    </p>
+                    <div class="pokemon-stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-label">HP</span>
+                            <div class="progress-bar-container hp-bar">
+                                <div class="progress-bar-fill" [style.width.%]="pokemon.calculatedHp"></div>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">STR</span>
+                            <div class="progress-bar-container str-bar">
+                                <div class="progress-bar-segment" [class.filled]="getStatPercentage(pokemon.calculatedStrength) >= 50"></div>
+                                <div class="progress-bar-segment" [class.filled]="getStatPercentage(pokemon.calculatedStrength) >= 100"></div>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">WEAK</span>
+                            <div class="progress-bar-container weak-bar">
+                                <div class="progress-bar-segment" [class.filled]="getStatPercentage(pokemon.calculatedWeakness) >= 100"></div>
+                            </div>
+                        </div>
+                        <div class="stat-item happiness-item">
+                            <div class="happiness-icons">
+                                <ng-container *ngFor="let i of [0,1,2,3,4]">
+                                    <img
+                                        src="assets/cute.png"
+                                        alt="H"
+                                        class="happiness-icon"
+                                        [class.active]="i < pokemon.calculatedHappiness"
+                                        onError="this.alt='♥︎';" />
+                                </ng-container>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
 
     <footer id="footer">
@@ -12,6 +62,8 @@
 
     <app-modal
       [isOpen]="isModalOpen"
-      (close)="closeModal()">
+      (close)="closeModal()"
+      (pokemonAdded)="handleAddPokemon($event)"
+      [pokedexList]="pokedexPokemon">
     </app-modal>
 </div>

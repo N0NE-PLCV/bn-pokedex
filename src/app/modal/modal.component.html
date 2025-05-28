@@ -11,7 +11,7 @@
 
     <div class="modal-body">
       <div class="pokemon-results">
-        <div *ngFor="let pokemon of pokemonList" class="pokemon-card">
+        <div *ngFor="let pokemon of displayablePokemonList" class="pokemon-card">
           <div class="pokemon-image-container">
             <img
               [src]="pokemon.imageUrl"
@@ -63,7 +63,7 @@
             <button class="add-button" (click)="addPokemonToPokedex(pokemon)">ADD</button>
           </div>
         </div>
-        <div *ngIf="pokemonList.length === 0 && searchText && searchText.trim().length > 0" class="no-results-message">
+        <div *ngIf="displayablePokemonList.length === 0 && searchText && searchText.trim().length > 0" class="no-results-message">
           No Pokémon found matching "{{ searchText }}".
         </div>
       </div>

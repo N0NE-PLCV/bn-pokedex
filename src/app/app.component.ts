@@ -21,11 +21,35 @@ const COLORS = {
 })
 export class AppComponent {
   isModalOpen: boolean = false;
+  pokedexPokemon: any[] = []; // Stores Pokémon in the Pokedex
 
   openModal() {
     this.isModalOpen = true;
   }
+
   closeModal() {
     this.isModalOpen = false;
+  }
+
+  handleAddPokemon(pokemon: any) {
+    // Add to Pokedex if not already present
+    if (!this.pokedexPokemon.find(p => p.id === pokemon.id)) {
+      // Create a new array reference to ensure change detection is triggered
+      this.pokedexPokemon = [...this.pokedexPokemon, pokemon];
+    }
+    // Optionally, you might want to close the modal after adding
+    // this.closeModal();
+  }
+
+  handleRemovePokemon(pokemonToRemove: any) {
+    // .filter() already returns a new array, so this is fine for change detection
+    this.pokedexPokemon = this.pokedexPokemon.filter(p => p.id !== pokemonToRemove.id);
+  }
+
+  // Helper function to parse stat percentages (e.g., "50%" to 50)
+  getStatPercentage(statString: string | undefined): number {
+    if (!statString) return 0;
+    const match = statString.match(/(\d+)/);
+    return match ? parseInt(match[0], 10) : 0;
   }
 }

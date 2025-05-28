@@ -53,5 +53,152 @@
 }
 
 
+#card-section {
+  padding: 20px;
+  background-color: white; // Light background for the section
+  min-height: 200px; // Ensure the section has some height
+}
 
+.empty-pokedex-message {
+  text-align: center;
+  color: #777;
+  font-size: 1.2em;
+  padding: 40px 20px;
+}
+
+.pokedex-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); // Responsive grid
+  gap: 20px;
+}
+
+.pokemon-card-display {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  position: relative; // For absolute positioning of delete button
+
+  .delete-button {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+    line-height: 24px;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    z-index: 10;
+
+    &:hover {
+      background-color: #cc0000;
+    }
+  }
+
+  .pokemon-image-container {
+    width: 100%;
+    height: 150px; // Fixed height for image consistency
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px;
+    img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+  }
+
+  .pokemon-info {
+    text-align: center;
+    .pokemon-name {
+      margin: 10px 0 5px;
+      font-size: 1.4em;
+      font-weight: bold;
+    }
+    .pokemon-type {
+      font-size: 0.9em;
+      color: #555;
+      margin-bottom: 15px;
+      text-transform: capitalize;
+    }
+  }
+
+  .pokemon-stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; // Two columns for stats
+    gap: 10px;
+    align-items: center; // Align items vertically
+    font-size: 0.9em;
+
+    .stat-item {
+      display: flex;
+      flex-direction: column; // Label above bar/icons
+      align-items: center; // Center content of stat item
+      
+      .stat-label {
+        font-weight: bold;
+        margin-bottom: 4px;
+      }
+    }
+
+    // Progress bar styling (similar to modal)
+    .progress-bar-container {
+      width: 100px; // Fixed width for progress bars
+      height: 10px;
+      background-color: #e0e0e0;
+      border-radius: 5px;
+      overflow: hidden;
+      display: flex; // For segmented bars
+
+      &.hp-bar .progress-bar-fill {
+        background-color: #4caf50; // Green for HP
+        height: 100%;
+      }
+      &.str-bar, &.weak-bar {
+        .progress-bar-segment {
+          flex: 1;
+          height: 100%;
+          background-color: #e0e0e0; // Default segment color
+          border-right: 1px solid #ccc;
+          &:last-child {
+            border-right: none;
+          }
+          &.filled {
+            background-color: #ffc107; // Yellow for STR/WEAK filled segments
+          }
+        }
+      }
+    }
+    
+    .happiness-item {
+      grid-column: span 2; // Make happiness span both columns
+      margin-top: 5px;
+    }
+
+    .happiness-icons {
+      display: flex;
+      justify-content: center;
+      img.happiness-icon {
+        width: 20px;
+        height: 20px;
+        margin: 0 2px;
+        filter: grayscale(100%); // Inactive state
+        opacity: 0.5;
+        &.active {
+          filter: grayscale(0%);
+          opacity: 1;
+        }
+      }
+    }
+  }
+}
 
