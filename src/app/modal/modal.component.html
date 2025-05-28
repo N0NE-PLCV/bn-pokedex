@@ -1,34 +1,67 @@
 <div class="modal-overlay" *ngIf="isOpen" (click)="closeModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
-      <div class="search-wrapper"> 
-        <input 
-          type="text" 
-          [(ngModel)]="searchText" 
-          placeholder="Find Pokémon" 
-          (keyup.enter)="searchPokemon()" />
-          <img class="search-icon" src="assets/search.png" alt="Search Icon" (click)="searchPokemon()" />
-      </div>
-      
-    
+    <div class="search-wrapper">
+      <input
+        type="text"
+        [(ngModel)]="searchText"
+        (keyup.enter)="searchPokemon()"
+        placeholder="Find Pokémon" />
+      <img class="search-icon" src="assets/search.png" alt="Search Icon" (click)="searchPokemon()" />
+    </div>
+
     <div class="modal-body">
-    
-      
       <div class="pokemon-results">
         <div *ngFor="let pokemon of pokemonList" class="pokemon-card">
-          <img 
-            [src]="pokemon.imageUrl" 
-            [alt]="pokemon.name" 
-            onError="this.src='https://placehold.co/96x96/EEE/333?text=No+Image'" />
-          <p>{{ pokemon.name }}</p>
-          <!-- 
-            Display other Pokémon info (HP, Strength, Weakness, Happiness) here.
-            You'll need to calculate these values based on the README.md 
-            and ensure they are available on the 'pokemon' object.
-            Example:
-            <p>HP: {{ pokemon.calculatedHp }}</p>
-            <p>Type(s): {{ pokemon.types?.join(', ') }}</p> 
-          -->
-          <button (click)="addPokemonToPokedex(pokemon)">Add</button> 
+          <div class="pokemon-image-container">
+            <img
+              [src]="pokemon.imageUrl"
+              [alt]="pokemon.name"
+              onError="this.src='https://placehold.co/100x100/EEE/333?text=No+Img'" />
+          </div>
+          <div class="pokemon-info">
+            <h3 class="pokemon-name">{{ pokemon.name }}</h3>
+            <p class="pokemon-type">
+              {{ pokemon.types?.join(', ') || 'N/A' }}
+            </p>
+
+            <div class="pokemon-stats-grid">
+              <div class="stat-item">
+                <span class="stat-label">HP</span>
+                <div class="progress-bar-container hp-bar">
+                  <div class="progress-bar-fill" [style.width.%]="pokemon.calculatedHp"></div>
+                </div>
+              </div>
+
+              <div class="stat-item">
+                <span class="stat-label">STR</span>
+                <div class="progress-bar-container str-bar">
+                  <div class="progress-bar-segment" [class.filled]="getStatPercentage(pokemon.calculatedStrength) >= 50"></div>
+                  <div class="progress-bar-segment" [class.filled]="getStatPercentage(pokemon.calculatedStrength) >= 100"></div>
+                </div>
+              </div>
+
+              <div class="stat-item">
+                <span class="stat-label">WEAK</span>
+                 <div class="progress-bar-container weak-bar">
+                  <div class="progress-bar-segment" [class.filled]="getStatPercentage(pokemon.calculatedWeakness) >= 100"></div>
+                </div>
+              </div>
+
+              <div class="stat-item happiness-item">
+                 <div class="happiness-icons">
+                  <ng-container *ngFor="let i of [0,1,2,3,4]">
+                    <img
+                      src="assets/cute.png"
+                      alt="H"
+                      class="happiness-icon"
+                      [class.active]="i < pokemon.calculatedHappiness"
+                      onError="this.alt='♥︎';" />
+                  </ng-container>
+                </div>
+              </div>
+            </div>
+            <button class="add-button" (click)="addPokemonToPokedex(pokemon)">ADD</button>
+          </div>
         </div>
         <div *ngIf="pokemonList.length === 0 && searchText && searchText.trim().length > 0" class="no-results-message">
           No Pokémon found matching "{{ searchText }}".

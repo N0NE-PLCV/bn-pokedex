@@ -1,82 +1,332 @@
+// src/app/modal/modal.component.scss
+
+// Fonts (assuming these are globally available as per README)
+$font-family-gaegu: 'Gaegu', cursive;
+$font-family-atma: 'Atma', cursive;
+
+// Colors based on image_823094.png
+$color-modal-bg: #FFFFFF;
+$color-search-text: #000000;
+$color-search-icon: #FF0000; // Red search icon
+$color-pokemon-name: #000000;
+$color-stat-label: #000000;
+$color-progress-bar-fill: #4A90E2; // Blue for HP, STR, WEAK bars
+$color-progress-bar-track: #E0E0E0; // Light grey track for bars
+$color-happiness-icon-active: #FFA500; // Yellowish-orange for active happiness
+$color-happiness-icon-inactive: #D3D3D3; // Grey for inactive happiness
+$color-separator-line: #EAEAEA; // Light grey for line between cards
+$color-text-light: #555555; // For Pokemon type, no results message
+
+// General Modal Styles
 .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.4);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4); 
+  display: flex;
+  justify-content: center;
+  align-items: center;
   
-  .modal-content {
-    background-color: white;
-    padding: 0;
-    border-radius: 8px;
-    width: 900px;
-  
-    min-height: 700px;
-    box-shadow:#474444 rgba(86, 86, 236, 0.15);
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 10px;
-    margin-bottom: 10px;
-  }
-  
-  .modal-footer {
-    border-top: 1px solid #ddd;
-    padding-top: 10px;
-    margin-top: 10px;
-    text-align: right;
-  }
-  
-  .search-wrapper {
-    display: flex;
-    align-items: center;
-    background: #f3f4f7;
-    border: #e6e6e6;
-    position: relative;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 2;
-    padding: 12px 24px;
-    margin-bottom: 0;
-  }
-  
-  .search-wrapper input[type="text"] {
+}
+
+.modal-content {
+  background-color: $color-modal-bg;
+  padding: 20px 25px;
+  border-radius: 8px; 
+  box-shadow: #474444;
+  width: 90%;
+  max-width: 800px; // Adjust for typical iPad modal width
+  height: 85%;
+  max-height: 650px;
+  display: flex;
+  flex-direction: column;
+  font-family: $font-family-gaegu; // Default font for the modal
+}
+
+.search-wrapper {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0;
+  background-color: #f3f4f7; 
+  border: #e6e6e6; 
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  padding: 12px 24px;
+
+  input[type="text"] {
     flex: 1;
     border: none;
-    background: transparent;
     outline: none;
-    font-size: 1.2rem;
     padding: 4px 0;
-    font-family: "Atma", cursive;
-    font-weight: bold;
-    color: #222;
+    font-size: 1.5em;
+    font-family: $font-family-atma;
+    
+    color: $color-search-text;
+    background-color: transparent;
   }
-  
+
   .search-icon {
-    width: 24px;
-    height: 24px;
-    margin-left: 12px;
-    opacity: 0.8;
-    filter: hue-rotate(-20deg) saturate(2);
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+    margin-left: 10px;
+    // For a red search icon, if your assets/search.png is not already red,
+    // you might need a different asset or use an inline SVG.
+    // This example assumes you might have a red icon or can style an SVG.
+    // If using a filter on a black icon to make it red:
+    // filter: invert(15%) sepia(100%) saturate(7458%) hue-rotate(3deg) brightness(96%) contrast(115%);
+    // For simplicity, this SCSS won't apply a filter, assuming the asset is correct.
+    // If you need to color it via CSS and it's an SVG, you can use 'fill: $color-search-icon;'
+  }
+}
+
+.modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 8px; // Space for scrollbar
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: darken($color-modal-bg, 3%);
+    border-radius: 3px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: $color-separator-line;
+    border-radius: 3px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: darken($color-separator-line, 10%);
+  }
+}
+
+.pokemon-results {
+  display: flex;
+  flex-direction: column; // Stack cards vertically
+  gap: 0; // No gap, separator line will handle spacing
+}
+
+.pokemon-card {
+  background-color: $color-modal-bg; // Card bg same as modal bg
+  padding: 15px 0; // Padding top/bottom, no horizontal padding for full width elements
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start; // Align items to the top
+  border-bottom: 1px solid $color-separator-line; // Separator line
+  position: relative;
+  transition: box-shadow 0.2s;
+  box-shadow: none;
+
+  &:hover {
+    box-shadow: 0 4px 24px rgba(86, 86, 236, 0.18);
+    z-index: 3;
+    .add-button {
+      opacity: 1;
+      pointer-events: auto;
+      transition: opacity 0.2s;
+    }
+  }
+
+  &:last-child {
+    border-bottom: none; // No line for the last card
+  }
+}
+
+.add-button {
+  position: absolute;
+  top: 18px;
+  right: 24px;
+  background: none;
+  border: none;
+  color: #1976d2;
+  font-family: $font-family-atma;
+  font-size: 1.3em;
+  font-weight: bold;
+  cursor: pointer;
+  transition: color 0.2s, opacity 0.2s;
+  outline: none;
+  z-index: 2;
+  text-decoration: underline;
+  opacity: 0;
+  pointer-events: none;
+
+  &:hover {
+    color: #0d47a1;
+    text-decoration: underline;
+  }
+}
+
+.pokemon-image-container {
+  flex-shrink: 0;
+  margin-right: 18px; // Space between image and info
+  width: 120px; // Adjust as per image_823094.png proportions
+  height: 120px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #F5F5F5; // Light background for image if needed
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+
+  img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 6px;
+  }
+}
+
+.pokemon-info {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+
+  .pokemon-name {
+    font-family: $font-family-atma; // Or another bold sans-serif if Atma isn't quite right for all-caps
+    font-weight: 700; // Bold
+    font-size: 1.5em; // Prominent name
+    color: $color-pokemon-name;
+    margin-top: 0;
+    margin-bottom: 3px;
+    text-transform: uppercase; // All caps as in image
+  }
+
+  .pokemon-type {
+    font-family: $font-family-gaegu;
+    font-size: 0.9em;
+    color: $color-text-light;
+    margin-bottom: 10px;
+    font-weight: normal; // Type is not bold in the image
+  }
+}
+
+.pokemon-stats-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px; // Space between stat rows
+  margin-bottom: 10px; // Space before where ADD button would be
+
+  .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 8px; // Space between label and bar/icons
+
+    .stat-label {
+      font-family: $font-family-gaegu; // Gaegu for stat labels
+      font-weight: bold; // Labels are bold in the image
+      font-size: 0.9em;
+      color: $color-stat-label;
+      width: 40px; // Fixed width for alignment (HP, STR, WEAK)
+      flex-shrink: 0;
+      text-transform: uppercase;
+    }
+  }
+}
+
+.progress-bar-container {
+  flex-grow: 1;
+  height: 12px; // Thinner bars as in image
+  background-color: $color-progress-bar-track;
+  border-radius: 6px; // Rounded bars
+  overflow: hidden;
+  display: flex; // Still needed for fill or segments
+
+  // Common style for all progress bar fills (HP, STR, WEAK are all blue)
+  .progress-bar-fill,
+  .progress-bar-segment.filled {
+    height: 100%;
+    background-color: $color-progress-bar-fill; // Blue for all
+    border-radius: 6px; // Match container's rounding
+    transition: width 0.3s ease-out, background-color 0.3s ease;
+  }
+
+  // For STR and WEAK, if they were still segmented (image shows solid)
+  // We'll style .progress-bar-segment for the case where it's NOT filled
+  // but the image implies STR/WEAK bars are solid like HP.
+  // So, we'll treat str-bar and weak-bar's "segments" as single fills.
+  // The HTML uses .progress-bar-segment for STR/WEAK.
+  // The .filled class will apply the blue color.
+  // If a segment is not .filled, it should appear as part of the track.
+  .progress-bar-segment {
+    flex-grow: 1; // If there were multiple segments
+    height: 100%;
+    background-color: transparent; // Non-filled segments are part of the track
+    border-radius: 6px;
   }
   
-  .modal-body {
-    flex: 1;
-    overflow-y: auto;
-    padding: 32px 32px 32px 32px;
-    background: #f3f4f7;
+  // Specific handling for STR and WEAK bars to ensure they use the single fill style
+  // The HTML structure for STR has two segments, WEAK has one.
+  // To make them appear as single blue bars like HP:
+  // We will rely on the [style.width.%] for HP,
+  // and for STR/WEAK, the .filled class on segments will make them blue.
+  // The HTML for STR has two segments. If STR is 50%, one is blue. If 100%, both are blue, appearing as one.
+  // The HTML for WEAK has one segment. If 100%, it's blue.
+
+  // This structure is a bit tricky with the existing HTML for STR/WEAK if they are to be solid.
+  // A better HTML for solid STR/WEAK would be like HP:
+  // <div class="progress-bar-fill" [style.width.%]="getStatPercentage(pokemon.calculatedStrength)"></div>
+  // However, sticking to "don't change old format" for HTML:
+  // The existing SCSS for .str-bar and .weak-bar with .progress-bar-segment.filled
+  // will color the segments blue. If the track is $color-progress-bar-track,
+  // and segments have a gap or padding, they'd look distinct.
+  // To make them look like one solid bar as in image_823094.png:
+  &.str-bar, &.weak-bar {
+    gap: 0; // No gap between segments
+    padding: 0; // No padding
   }
+}
+
+
+.happiness-item {
+  // The image_823094.png doesn't show a "Happiness" label.
+  // The icons are directly under the WEAK bar.
+  // We need to align the happiness icons.
+  // The .stat-label for happiness can be hidden if not needed.
+  .stat-label {
+    // display: none; // Uncomment if you want to hide "Happiness" text label
+  }
+
+  .happiness-icons {
+    display: flex;
+    align-items: center;
+    // If stat-label for happiness is hidden, no need for margin-left to align with bars.
+    // If stat-label is present, this margin helps:
+    // margin-left: 48px; // Approx label width (40px) + gap (8px)
+
+    .happiness-icon {
+      width: 18px; // Adjust size of cute.png
+      height: 18px;
+      margin-right: 3px; // Small space between icons
+      
+      // Assuming cute.png is a single color (e.g., black or grey)
+      // and we want to color it yellowish-orange when active.
+      // If cute.png is already yellowish-orange, this filter is not needed.
+      // filter: grayscale(100%) brightness(150%) opacity(0.4); // Default inactive state: greyed out
+
+      // More direct opacity for inactive state:
+      opacity: 0.3; // Inactive state from previous SCSS
+
+      &.active {
+        // filter: none; // Remove filter for active state if cute.png is already the target color
+        // If cute.png needs to be colored to $color-happiness-icon-active:
+        // Example filter to make a black icon orange:
+        // filter: invert(65%) sepia(88%) saturate(1165%) hue-rotate(359deg) brightness(101%) contrast(101%);
+        opacity: 1; // Active state from previous SCSS
+      }
+    }
+  }
+}
+
+
+.no-results-message {
+  text-align: center;
+  padding: 25px;
+  font-size: 1.2em;
+  color: $color-text-light;
+  font-family: $font-family-gaegu;
+}
