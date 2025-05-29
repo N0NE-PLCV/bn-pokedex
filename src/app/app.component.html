@@ -35,10 +35,9 @@
                             <div class="progress-bar-container weak-bar">
                                 <div class="progress-bar-segment" [class.filled]="getStatPercentage(pokemon.calculatedWeakness) >= 100"></div>
                             </div>
-                        </div>
-                        <div class="stat-item happiness-item">
+                        </div>                        <div class="stat-item happiness-item">
                             <div class="happiness-icons">
-                                <ng-container *ngFor="let i of [0,1,2,3,4]">
+                                <ng-container *ngFor="let i of [0,1,2,3,4,5]">
                                     <img
                                         src="assets/cute.png"
                                         alt="H"
