@@ -2,7 +2,7 @@
 import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core'; // Added OnChanges, SimpleChanges
 import { PokemonService } from '../service/pokemon.service';
 import { forkJoin, of } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'app-modal',
@@ -129,6 +129,7 @@ export class ModalComponent implements OnChanges { // Added OnChanges
   }
   private calculateHappiness(hp: number, damage: number, weaknesses?: any[]): number {
     const weaknessCount = weaknesses?.length || 0;
-    return Math.max(0, Math.round(((hp / 10) + (damage / 10) + 10 - weaknessCount) / 5));
+    const happiness = Math.max(0, Math.round(((hp / 10) + (damage / 20) + 10 - weaknessCount) / 4));
+    return Math.min(6, happiness); // Ensure maximum of 6 stars
   }
 }
