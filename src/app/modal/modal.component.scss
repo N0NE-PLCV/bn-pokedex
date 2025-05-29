@@ -74,13 +74,7 @@ $color-text-light: #555555; // For Pokemon type, no results message
     height: 22px;
     cursor: pointer;
     margin-left: 10px;
-    // For a red search icon, if your assets/search.png is not already red,
-    // you might need a different asset or use an inline SVG.
-    // This example assumes you might have a red icon or can style an SVG.
-    // If using a filter on a black icon to make it red:
-    // filter: invert(15%) sepia(100%) saturate(7458%) hue-rotate(3deg) brightness(96%) contrast(115%);
-    // For simplicity, this SCSS won't apply a filter, assuming the asset is correct.
-    // If you need to color it via CSS and it's an SVG, you can use 'fill: $color-search-icon;'
+    
   }
 }
 
@@ -259,22 +253,7 @@ $color-text-light: #555555; // For Pokemon type, no results message
     border-radius: 6px;
   }
   
-  // Specific handling for STR and WEAK bars to ensure they use the single fill style
-  // The HTML structure for STR has two segments, WEAK has one.
-  // To make them appear as single blue bars like HP:
-  // We will rely on the [style.width.%] for HP,
-  // and for STR/WEAK, the .filled class on segments will make them blue.
-  // The HTML for STR has two segments. If STR is 50%, one is blue. If 100%, both are blue, appearing as one.
-  // The HTML for WEAK has one segment. If 100%, it's blue.
-
-  // This structure is a bit tricky with the existing HTML for STR/WEAK if they are to be solid.
-  // A better HTML for solid STR/WEAK would be like HP:
-  // <div class="progress-bar-fill" [style.width.%]="getStatPercentage(pokemon.calculatedStrength)"></div>
-  // However, sticking to "don't change old format" for HTML:
-  // The existing SCSS for .str-bar and .weak-bar with .progress-bar-segment.filled
-  // will color the segments blue. If the track is $color-progress-bar-track,
-  // and segments have a gap or padding, they'd look distinct.
-  // To make them look like one solid bar as in image_823094.png:
+  
   &.str-bar, &.weak-bar {
     gap: 0; // No gap between segments
     padding: 0; // No padding
@@ -283,39 +262,26 @@ $color-text-light: #555555; // For Pokemon type, no results message
 
 
 .happiness-item {
-  // The image_823094.png doesn't show a "Happiness" label.
-  // The icons are directly under the WEAK bar.
-  // We need to align the happiness icons.
-  // The .stat-label for happiness can be hidden if not needed.
+  
   .stat-label {
-    // display: none; // Uncomment if you want to hide "Happiness" text label
+    
   }
 
   .happiness-icons {
     display: flex;
     align-items: center;
-    // If stat-label for happiness is hidden, no need for margin-left to align with bars.
-    // If stat-label is present, this margin helps:
-    // margin-left: 48px; // Approx label width (40px) + gap (8px)
+    
 
     .happiness-icon {
       width: 18px; // Adjust size of cute.png
       height: 18px;
       margin-right: 3px; // Small space between icons
       
-      // Assuming cute.png is a single color (e.g., black or grey)
-      // and we want to color it yellowish-orange when active.
-      // If cute.png is already yellowish-orange, this filter is not needed.
-      // filter: grayscale(100%) brightness(150%) opacity(0.4); // Default inactive state: greyed out
-
-      // More direct opacity for inactive state:
+      
       opacity: 0.3; // Inactive state from previous SCSS
 
       &.active {
-        // filter: none; // Remove filter for active state if cute.png is already the target color
-        // If cute.png needs to be colored to $color-happiness-icon-active:
-        // Example filter to make a black icon orange:
-        // filter: invert(65%) sepia(88%) saturate(1165%) hue-rotate(359deg) brightness(101%) contrast(101%);
+        
         opacity: 1; // Active state from previous SCSS
       }
     }
