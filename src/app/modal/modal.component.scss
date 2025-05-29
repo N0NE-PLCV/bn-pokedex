@@ -239,13 +239,7 @@ $color-text-light: #555555; // For Pokemon type, no results message
     transition: width 0.3s ease-out, background-color 0.3s ease;
   }
 
-  // For STR and WEAK, if they were still segmented (image shows solid)
-  // We'll style .progress-bar-segment for the case where it's NOT filled
-  // but the image implies STR/WEAK bars are solid like HP.
-  // So, we'll treat str-bar and weak-bar's "segments" as single fills.
-  // The HTML uses .progress-bar-segment for STR/WEAK.
-  // The .filled class will apply the blue color.
-  // If a segment is not .filled, it should appear as part of the track.
+ 
   .progress-bar-segment {
     flex-grow: 1; // If there were multiple segments
     height: 100%;
